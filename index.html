@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NIVASA AI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background: #f6f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .auth-container, .generator-container {
+            max-width: 420px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(30,32,104,0.08);
+            margin: 44px auto 0 auto;
+            padding: 40px 32px;
+        }
+        .generator-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        .center-title {
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: #2446c7;
+            margin-bottom: 22px;
+        }
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 32px;
+            border-radius: 10px;
+        }
+        .auth-tab {
+            flex:1;
+            padding: 14px 0;
+            text-align:center;
+            color: #2446c7;
+            background: #f6f7fa;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+            border:none;
+        }
+        .auth-tab.active {
+            background: #fff;
+            color: #1460e7;
+            border-bottom: 3px solid #1460e7;
+        }
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        .form-group label {
+            font-weight: 600;
+            display:block;
+            margin-bottom:5px;
+            color: #222;
+        }
+        .form-group input {
+            padding: 12px;
+            width:100%;
+            border-radius: 5px;
+            border:1.5px solid #d0d5e2;
+            font-size:1rem;
+            outline:none;
+            transition: border-color 0.18s;
+        }
+        .form-group input:focus {
+            border-color:#2446c7;
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 18px;
+            background: linear-gradient(90deg,#2f24c7e2 50%,#3861cd 100%);
+            color: #fff;
+            font-size: 1.14rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor:pointer;
+            transition: background 0.15s;
+        }
+        .auth-btn:hover {
+            background: #1460e7;
+        }
+        .auth-footer, .skip-auth {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.96rem;
+            color: #555;
+        }
+        .auth-footer a, .skip-auth-btn {
+            color: #183df3;
+            font-weight: 600;
+            text-decoration: underline;
+            cursor:pointer;
+        }
+        .skip-auth-btn {
+            background: none;
+            border: none;
+            font-size: inherit;
+        }
+        .error-message {
+            color: #d50f19;
+            font-size: 0.99em;
+            padding: 8px;
+            background: #fff3f5;
+            border-left: 3px solid #d50f19;
+            border-radius: 7px;
+            margin:6px 0 0 0;
+        }
+
+        /* Generator page */
+        .feature-tags {
+            margin:15px 0 24px 0;
+        }
+        .feature-tag {
+            margin: 0 7px 7px 0;
+            display:inline-block;
+            padding:7px 20px;
+            border-radius:20px;
+            font-size:0.95rem;
+            background:linear-gradient(90deg,#cfddfa 10%,#e6eefd 90%);
+            color:#3518f3;
+            font-weight:600;
+        }
+        .card-section {
+            background: #fff;
+            border-radius: 13px;
+            margin: 0 auto 25px auto;
+            box-shadow: 0 2px 12px rgba(99,110,180,0.07);
+            text-align:left;
+            padding: 20px 30px;
+            max-width:720px;
+        }
+        .section-title {
+            color: #3723ed;
+            font-size: 1.18rem;
+            font-weight: 600;
+            margin-bottom:20px;
+        }
+        .card-section label {
+            font-weight:500;
+        }
+        .card-section input, .card-section select {
+            margin-top:7px;
+            padding:12px;
+            border-radius:7px;
+            border:1.5px solid #cad4f1;
+            font-size:1.03rem;
+            width: 100%;
+        }
+        .card-section input:focus, .card-section select:focus {
+            border-color: #2446c7;
+        }
+        .gen-btn {
+            margin: 38px auto 0 auto;
+            padding: 18px;
+            width: 60%;
+            font-size: 1.16rem;
+            border-radius: 12px;
+            font-weight:600;
+            background: linear-gradient(90deg,#2446c7 50%,#9f21ee 100%);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(58,76,212,0.18);
+            cursor:pointer;
+            transition: background 0.18s, transform .06s;
+        }
+        .gen-btn:hover {
+            background: #09e0e4;
+            transform: translateY(-2px);
+        }
+        .result-container {
+            margin: 60px auto 0 auto;
+            max-width:730px;
+        }
+        .plan-image {
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 14px;
+            box-shadow: 0 4px 18px rgba(50,60,110,0.10);
+        }
+        .plan-details {
+            margin-top: 12px;
+        }
+        .plan-features {
+            margin: 14px 0;
+            display: flex;
+            gap:15px;
+            flex-wrap: wrap;
+        }
+        .plan-feature {
+            background: #e8f4fd;
+            color: #0b5c9e;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.99rem;
+            display: flex;
+            align-items: center;
+        }
+        .plan-actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 14px;
+        }
+        .plan-btn {
+            padding:10px 18px;
+            border-radius:6px;
+            cursor:pointer;
+            font-weight:600;
+            border:none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            transition: all 0.3s;
+            text-decoration:none;
+        }
+        .view-btn {background:#2446c7;}
+        .view-btn:hover {background:#1460e7;}
+        .download-btn {background:#beeb0d;}
+        .download-btn:hover {background:#e86e17;}
+        .loading-spinner {
+            border: 4px solid #f0f2f6;
+            border-radius: 50%;
+            border-top: 4px solid #3a4cd4;
+            width: 34px;
+            height: 34px;
+            animation: spin 1s linear infinite;
+            margin: 25px auto;
+        }
+        @keyframes spin {0% { transform: rotate(0);}100% { transform: rotate(360deg);}}
+
+        /* Chatbot */
+        .chat-toggle-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: #2446c7;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(58, 76, 212, 0.25);
+            cursor: pointer;
+            z-index: 3333;
+            font-size: 2rem;
+            display: flex;justify-content:center;align-items: center;
+            transition: background 0.15s, transform .16s;
+        }
+        .chat-toggle-btn:hover { background: #1460e7; transform:scale(1.08);}
+        .chat-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 340px;
+            height: 440px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.14);
+            z-index: 3500;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.18s;
+            opacity:0;pointer-events:none;
+        }
+        .chat-container.open { opacity:1; pointer-events:all;}
+        .chat-header {
+            background: linear-gradient(135deg, #ae24e4, #4358e1);
+            color: white;
+            padding: 14px 22px;
+            font-weight:600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-close { background:none;border:none;color:white;cursor:pointer;font-size:1.1rem;}
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f9faff;
+        }
+        .chat-input-container {
+            display: flex;
+            padding: 14px;
+            background: white;
+            border-top: 1px solid #e9e9f5;
+            gap:8px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1.5px solid #d0d4ee;
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.98rem;
+        }
+        .chat-send {
+            background: #2446c7;
+            border: none;
+            color: white;
+            border-radius: 18px;
+            padding: 8px 16px;
+            font-weight: 700;
+            font-size:1em;
+            cursor:pointer;
+            transition: background .14s;
+        }
+        .chat-send:hover {background: #1460e7;}
+        .message {margin-bottom:13px;display:flex;}
+        .message.bot {justify-content: flex-start;}
+        .message.user {justify-content: flex-end;}
+        .message-content {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 0.97em;
+        }
+        .bot .message-content {
+            background: #f4f7ff;
+            border: 1.5px solid #d0daf3;
+        }
+        .user .message-content {
+            background: #3696cd;
+            color: white;
+        }
+        .typing-indicator {padding:10px;margin-bottom:10px;}
+        .typing-dot {
+            display:inline-block;
+            width:6px;height:6px;background:#999;
+            border-radius:50%;margin:0 2px;
+            animation:typingAnimation 1.4s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(2) {animation-delay:0.2s;}
+        .typing-dot:nth-child(3) {animation-delay:0.4s;}
+        @keyframes typingAnimation {
+            0%,60%,100% {transform:translateY(0);}
+            30% {transform:translateY(-3px);}
+        }
+        @media (max-width:600px){
+            .auth-container, .generator-container {max-width:80vw; padding:10px;}
+            .card-section {padding:10px;}
+            .chat-container {width:97vw;right:3px;}
+            .center-title {font-size: 1.3rem;}
+        }
+    </style>
+</head>
+<body>
+  <div id="authSection" class="auth-container">
+    <div class="center-title">Welcome to NIVASA AI</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin">Login</button>
+      <button class="auth-tab" id="tabSignup">Sign Up</button>
+    </div>
+
+    <form id="loginForm" style="display:block;">
+      <div class="form-group">
+        <label for="loginEmail"><i class="fas fa-user"></i> Email or Mobile</label>
+        <input type="text" id="loginEmail" placeholder="Enter email or mobile number"/>
+        <div class="error-message" id="loginEmailError" style="display:none"></div>
+      </div>
+      <div class="form-group">
+        <label for="loginPassword"><i class="fas fa-lock"></i> Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password"/>
+        <div class="error-message" id="loginPasswordError" style="display:none"></div>
+      </div>
+      <div style="text-align:right;font-size:1.0em; margin-bottom:14px;">
+        <a href="#" style="color:#f30505;" id="forgotPasswordLink">Forgot Password?</a>
+      </div>
+      <button class="auth-btn" type="button" id="loginBtn">Login</button>
+      <div class="auth-footer">
+        Don't have an account? <a href="#" id="showSignupLink">Sign up</a>
+      </div>
+      <div class="skip-auth">
+        <button class="skip-auth-btn" type="button" id="skipAuthBtn">Continue without account</button>
+      </div>
+    </form>
+
+    <form id="signupForm" style="display:none;">
+      <div class="form-group">
+        <label for="signupName"><i class="fas fa-user"></i> Full Name</label>
+        <input type="text" id="signupName" placeholder="Enter your full name"/>
+        <div class="error-message" id="signupNameError" style="display:none"></div>
+      </div>
+      <div class="form-group">
+        <label for="signupEmail"><i class="fas fa-envelope"></i> Email</label>
+        <input type="email" id="signupEmail" placeholder="Enter your email"/>
+        <div class="error-message" id="signupEmailError" style="display:none"></div>
+      </div>
+      <div class="form-group">
+        <label for="signupMobile"><i class="fas fa-phone"></i> Mobile Number</label>
+        <input type="tel" id="signupMobile" placeholder="Enter mobile number"/>
+        <div class="error-message" id="signupMobileError" style="display:none"></div>
+      </div>
+      <div class="form-group">
+        <label for="signupPassword"><i class="fas fa-lock"></i> Password</label>
+        <input type="password" id="signupPassword" placeholder="Create a password (min 6 chars)"/>
+        <div class="error-message" id="signupPasswordError" style="display:none"></div>
+      </div>
+      <div class="form-group">
+        <label for="signupConfirmPassword"><i class="fas fa-lock"></i> Confirm Password</label>
+        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password"/>
+        <div class="error-message" id="signupConfirmPasswordError" style="display:none"></div>
+      </div>
+      <button class="auth-btn" type="button" id="signupBtn">Create Account</button>
+      <div class="auth-footer">
+        Already have an account? <a href="#" id="showLoginLink">Login</a>
+      </div>
+      <div class="skip-auth">
+        <button class="skip-auth-btn" type="button" id="skipAuthBtn2">Continue without account</button>
+      </div>
+    </form>
+
+    <form id="forgotPasswordForm" style="display:none;">
+      <div class="center-title" style="font-size:1.3em;margin-bottom:22px;"><i class="fas fa-key"></i> Forgot Password</div>
+      <div class="form-group">
+        <label for="forgotEmail"><i class="fas fa-envelope"></i> Email or Mobile</label>
+        <input type="text" id="forgotEmail" placeholder="Enter your email or mobile number"/>
+        <div class="error-message" id="forgotEmailError" style="display:none"></div>
+      </div>
+      <button class="auth-btn" type="button" id="sendOtpBtn">Send OTP</button>
+      <div class="auth-footer">
+        Remember your password? <a href="#" id="backToLoginLink">Back to login</a>
+      </div>
+    </form>
+  </div>
+
+  <div id="homeSection" class="generator-container" style="display:none;">
+    <div style="text-align:right;margin-bottom:4px;">
+      <span id="userInfo" style="padding:6px 20px;border-radius:7px;background:#fff;color:#222;box-shadow:0 2px 6px rgba(50,60,100,0.08);font-weight:600;">Guest User</span>
+      <button id="logoutBtn" class="auth-btn" style="width:auto;display:inline-block;padding:9px 17px 9px 13px;float:right;margin-right:20px;margin-top:6px;font-size:0.98em;"><i class="fa fa-sign-out"></i> Logout</button>
+    </div>
+    <h1 class="center-title">NIVASA AI Generator</h1>
+    <div class="feature-tags">
+      <span class="feature-tag"><i class="fas fa-magic"></i> AI-Powered</span>
+      <span class="feature-tag"><i class="fas fa-home"></i> Custom Plans</span>
+      <span class="feature-tag"><i class="fas fa-bolt"></i> Instant Results</span>
+    </div>
+    <div class="card-section">
+      <div class="section-title"><i class="fas fa-ruler-combined"></i> Enter Square Footage</div>
+      <label for="squareFootageInput">Square Feet</label>
+      <input type="number" id="squareFootageInput" placeholder="e.g., 600" min="400" max="3000"/>
+    </div>
+    <div class="card-section">
+      <div class="section-title"><i class="fas fa-bed"></i> BHK Type</div>
+      <select id="bhkDropdown">
+        <option value="1" selected>1 BHK</option>
+        <option value="2">2 BHK</option>
+        <option value="3">3 BHK</option>
+      </select>
+    </div>
+    <button class="gen-btn" id="generateBtn"><i class="fas fa-bolt"></i> Generate House Plans</button>
+    <div class="loading-spinner" id="loadingIndicator" style="display:none;"></div>
+    <div class="result-container" id="resultContainer"></div>
+  </div>
+
+  <!-- Chatbot -->
+  <button id="chatToggleBtn" class="chat-toggle-btn" title="AI ChatBot"><i class="fas fa-comment-dots"></i></button>
+  <div id="chatContainer" class="chat-container">
+    <div class="chat-header">
+      <span><i class="fas fa-robot"></i> NIVASA AI Assistant</span>
+      <button class="chat-close" id="chatCloseBtn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message bot"><div class="message-content">Welcome to NIVASA AI! Ask me anything about house planning, registration, house plan details, or general support.</div></div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Type your message here..." autocomplete="off"/>
+      <button id="chatSendBtn" class="chat-send"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <script>
+    // --- Authentication UI Logic ---
+    const authSection = document.getElementById('authSection');
+    const homeSection = document.getElementById('homeSection');
+    const tabLogin = document.getElementById('tabLogin');
+    const tabSignup = document.getElementById('tabSignup');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    const skipAuthBtn = document.getElementById('skipAuthBtn');
+    const skipAuthBtn2 = document.getElementById('skipAuthBtn2');
+    const showSignupLink = document.getElementById('showSignupLink');
+    const showLoginLink = document.getElementById('showLoginLink');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userInfo = document.getElementById('userInfo');
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const backToLoginLink = document.getElementById('backToLoginLink');
+    let authToken = sessionStorage.getItem('authToken');
+    let currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+
+    function clearFormErrors() {
+      document.querySelectorAll('.error-message').forEach(e => { e.style.display = 'none'; });
+    }
+    function switchTab(tab) {
+      tabLogin.classList.remove('active');
+      tabSignup.classList.remove('active');
+      loginForm.style.display = 'none';
+      signupForm.style.display = 'none';
+      forgotPasswordForm.style.display = 'none';
+      if(tab === 'login') { tabLogin.classList.add('active'); loginForm.style.display = 'block'; }
+      else { tabSignup.classList.add('active'); signupForm.style.display = 'block'; }
+      clearFormErrors();
+    }
+    tabLogin.onclick = () => switchTab('login');
+    tabSignup.onclick = () => switchTab('signup');
+    showSignupLink.onclick = (e) => { e.preventDefault(); switchTab('signup'); }
+    showLoginLink.onclick = (e) => { e.preventDefault(); switchTab('login'); }
+    forgotPasswordLink.onclick = (e) => { e.preventDefault(); loginForm.style.display = 'none'; signupForm.style.display = 'none'; forgotPasswordForm.style.display = 'block'; clearFormErrors(); }
+    backToLoginLink.onclick = (e) => { e.preventDefault(); switchTab('login'); }
+    skipAuthBtn.onclick = skipAuthBtn2.onclick = () => { showHome('Guest User', null, null); };
+
+    logoutBtn.onclick = () => {
+      sessionStorage.removeItem('authToken');
+      sessionStorage.removeItem('currentUser');
+      authToken = null; currentUser = null;
+      authSection.style.display = "block";
+      homeSection.style.display = "none";
+    };
+
+    // --- API Calls for Auth ---
+    document.getElementById('loginBtn').onclick = async function() {
+      clearFormErrors();
+      const identifier = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      if(!identifier){ showError('loginEmailError', 'Email or mobile is required.'); return; }
+      if(!password){ showError('loginPasswordError', 'Password is required.'); return; }
+      try {
+        let res = await fetch('/api/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email_or_mobile: identifier, password: password})
+        });
+        let data = await res.json();
+        if(res.ok) showHome(data.user.name, data.token, data.user);
+        else showError('loginEmailError', data.error || 'Invalid credentials.');
+      } catch (e) { showError('loginEmailError', 'Network error.'); }
+    };
+
+    document.getElementById('signupBtn').onclick = async function() {
+      clearFormErrors();
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const mobile = document.getElementById('signupMobile').value.trim();
+      const password = document.getElementById('signupPassword').value.trim();
+      const confPass = document.getElementById('signupConfirmPassword').value.trim();
+
+      if(!name){ showError('signupNameError', 'Name is required.'); return; }
+      if(!email || !/\S+@\S+\.\S+/.test(email)){ showError('signupEmailError', 'Valid email required.'); return; }
+      if(!mobile || !/^\d{10}$/.test(mobile)){ showError('signupMobileError', 'Valid 10-digit mobile required.'); return; }
+      if(!password || password.length < 6){ showError('signupPasswordError', 'Password must be min 6 chars.'); return; }
+      if(confPass !== password){ showError('signupConfirmPasswordError', 'Passwords do not match.'); return; }
+
+      try {
+        let res = await fetch('/api/register', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({name, email, mobile, password})
+        });
+        let data = await res.json();
+        if(res.ok) showHome(data.user.name, data.token, data.user);
+        else showError('signupEmailError', data.error || 'Signup failed.');
+      } catch (e) { showError('signupEmailError', 'Network error.'); }
+    };
+
+    function showError(id, message) {
+      let el = document.getElementById(id);
+      el.style.display = 'block';
+      el.textContent = message;
+    }
+    function showHome(name, token = null, user = null) {
+      authSection.style.display = "none";
+      homeSection.style.display = "block";
+      userInfo.textContent = name;
+      if(token){
+        authToken = token;
+        sessionStorage.setItem('authToken', token);
+      }
+      if(user){
+        currentUser = user;
+        sessionStorage.setItem('currentUser', JSON.stringify(user));
+      } else {
+        authToken = null; currentUser = null;
+        sessionStorage.removeItem('authToken');
+        sessionStorage.removeItem('currentUser');
+      }
+    }
+
+    // --- House plan generation ---
+    document.getElementById('generateBtn').onclick = async function() {
+      const sqft = document.getElementById('squareFootageInput').value;
+      const bhk = document.getElementById('bhkDropdown').value;
+      const resultContainer = document.getElementById('resultContainer');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+
+      resultContainer.innerHTML = '';
+
+      if(!sqft || sqft < 400 || sqft > 3000) {
+        resultContainer.innerHTML = '<div class="error-message">Enter square footage between 400 and 3000.</div>';
+        return;
+      }
+
+      loadingIndicator.style.display = 'block';
+      try {
+        let response = await fetch('/api/get-plan', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({square_footage: parseInt(sqft), bedrooms: bhk})
+        });
+        let data = await response.json();
+        loadingIndicator.style.display = 'none';
+
+        if(response.ok && data.success){
+          resultContainer.innerHTML = `
+            <h2>Plan for ${sqft} sq ft, ${bhk} BHK</h2>
+            <div class="plan-details">${data.description || ""}</div>
+            <img class="plan-image" src="${data.image_url}" alt="${data.bhk} House Plan" />
+            <div class="plan-features">
+              <span class="plan-feature"><i class="fas fa-ruler-combined"></i> ${data.size} sq ft</span>
+              <span class="plan-feature"><i class="fas fa-bed"></i> ${data.bhk.toUpperCase()}</span>
+              <span class="plan-feature"><i class="fas fa-home"></i> Custom Design</span>
+            </div>
+            <div class="plan-actions">
+              <a href="${data.direct_link}" class="plan-btn view-btn" target="_blank"><i class="fas fa-eye"></i> View Plan</a>
+              <a href="${data.direct_link}" download class="plan-btn download-btn"><i class="fas fa-download"></i> Download Plan</a>
+            </div>
+          `;
+        } else {
+          resultContainer.innerHTML = `<div class="error-message">${data.error || 'No plan found.'}</div>`;
+        }
+      } catch(e) {
+        loadingIndicator.style.display = 'none';
+        resultContainer.innerHTML = '<div class="error-message">Network error. Please try again.</div>';
+      }
+    };
+
+    // --- Chatbot ---
+    const chatToggleBtn = document.getElementById('chatToggleBtn');
+    const chatContainer = document.getElementById('chatContainer');
+    const chatCloseBtn = document.getElementById('chatCloseBtn');
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    const chatInput = document.getElementById('chatInput');
+    const chatMessages = document.getElementById('chatMessages');
+
+    function toggleChat() {
+      chatContainer.classList.toggle('open');
+      if(chatContainer.classList.contains('open')) {
+        chatInput.focus();
+      }
+    }
+    chatToggleBtn.onclick = toggleChat;
+    chatCloseBtn.onclick = toggleChat;
+
+    chatSendBtn.onclick = sendMessage;
+    chatInput.onkeydown = function(e) {
+      if(e.key === 'Enter') {
+        sendMessage();
+      }
+    };
+
+    function sendMessage() {
+      const message = chatInput.value.trim();
+      if(!message) return;
+      addMessage(message, true);
+      chatInput.value = '';
+
+      // Simple canned bot response example
+      setTimeout(() => {
+        let response = "I understand you're looking for house plans. Please enter square footage and BHK type.";
+        if(/hi|hello|hey/i.test(message)) response = "Hello! How can I assist you today?";
+        else if(/login|signup|register/i.test(message)) response = "You can login or sign up using the forms provided.";
+        else if(/price|cost/i.test(message)) response = "Pricing depends on many factors; please contact support.";
+        else if(/thank/i.test(message)) response = "You're welcome! Feel free to ask anything else.";
+        addMessage(response, false);
+      }, 800);
+    }
+
+    function addMessage(text, isUser) {
+      const div = document.createElement('div');
+      div.className = 'message ' + (isUser ? 'user' : 'bot');
+      const content = document.createElement('div');
+      content.className = 'message-content';
+      content.textContent = text;
+      div.appendChild(content);
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Auto-show login or generator if token present on page load
+    if(authToken && currentUser){
+      showHome(currentUser.name, authToken, currentUser);
+    }
+  </script>
+</body>
+</html>
